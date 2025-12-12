@@ -20,39 +20,40 @@ const ContactList = () => {
     }, []);
 
     return (
-        <div className="mt-4">
-            <h3>Your Contacts</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-            <table className="table table-bordered mt-2">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Number</th>
-                        <th>Action</th>
+            <tbody>
+                {contacts.map((c) => (
+                    <tr key={c._id}>
+                        <td>{c.cname}</td>
+                        <td>{c.cnumber}</td>
+                        <td>
+                            <Link
+                                to={`/update/${c._id}`}
+                                className="btn btn-warning table-btn"
+                                style={{ marginRight: "5px" }}
+                            >
+                                Edit
+                            </Link>
+
+                            <button
+                                className="btn btn-danger table-btn"
+                                onClick={() => deleteContact(c._id)}
+                            >
+                                Delete
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-
-                <tbody>
-                    {contacts.map((c) => (
-                        <tr key={c._id}>
-                            <td>{c.cname}</td>
-                            <td>{c.cnumber}</td>
-                            <td>
-                                <Link className="btn btn-warning btn-sm me-2" to={`/update/${c._id}`}>
-                                    Edit
-                                </Link>
-
-                                <button className="btn btn-danger btn-sm"
-                                        onClick={() => deleteContact(c._id)}>
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-
-            </table>
-        </div>
+                ))}
+            </tbody>
+        </table>
     );
 };
 

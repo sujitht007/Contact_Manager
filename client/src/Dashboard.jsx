@@ -10,15 +10,16 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="container mt-3">
-            <h2>Contact Manager</h2>
+        <div className="container">
+            <div className="top-bar">
+                <h2>Your Contacts</h2>
+                <button className="btn btn-danger" style={{ width: "100px" }} onClick={logout}>
+                    Logout
+                </button>
+            </div>
 
-            <button className="btn btn-danger float-end" onClick={logout}>
-                Logout
-            </button>
-
-            <Link to="/add" className="btn btn-primary mt-3">
-                Add Contact
+            <Link to="/add" className="btn btn-primary">
+                + Add Contact
             </Link>
 
             <ContactList />

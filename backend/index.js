@@ -15,6 +15,16 @@ app.use(cors());
 mongoose.connect('mongodb+srv://sujith:9345793342S@cluster0.dquerwy.mongodb.net/').then(() => console.log("MongoDB Connected"))
 .catch(err => console.log("MongoDB Connection Error"));
 
+// Simple request timing logger to measure API latency
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const ms = Date.now() - start;
+        console.log(`${req.method} ${req.originalUrl} ${res.statusCode} - ${ms}ms`);
+    });
+    next();
+});
+
 const UserSchema = new mongoose.Schema({
     username : {type: String, required : true},
     email : {type : String,required:true, unique:true},
@@ -28,6 +38,9 @@ const ContactSchema = new mongoose.Schema({
     cnumber : {type : String,required : true},
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 })
+
+// index user field for faster queries by user
+ContactSchema.index({ user: 1 });
 
 const Contact = mongoose.model('Contact',ContactSchema);
 
@@ -93,7 +106,7 @@ app.post('/api/login',async(req,res)=>{
     }
 });
 
-app.post('/api/contact',async(req,res)=>{
+app.post('/api/contact', Verifytoken, async (req, res) => {
     try {
         const {cname,cnumber} = req.body;
         const contact = new Contact({
@@ -111,16 +124,16 @@ app.post('/api/contact',async(req,res)=>{
     }
 });
 
-app.get('/api/readcontact',async(req,res)=>{
-        try {
-        const contact = await Contact.find({ user: req.userId });
+app.get('/api/readcontact', Verifytoken, async (req, res) => {
+    try {
+        // use lean() to return plain JS objects (faster) and add exec() to run the query
+        const contact = await Contact.find({ user: req.userId }).lean().exec();
         res.json(contact);
-
     } catch (error) {
-        console.log("Get Food Error:", error);
+        console.log("Get Contacts Error:", error);
         res.status(500).json({ message: "Server Error" });
     }
-})
+});
 
 app.put('/api/updatecontact/:id', Verifytoken, async (req, res) => {
     try {
